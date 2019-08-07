@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Extensions.Logging;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace AzureFunctionsSample
 {
@@ -19,7 +21,7 @@ namespace AzureFunctionsSample
 
         [FunctionName("TodoGetAll")]
         public IActionResult GetAll(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Todo")] HttpRequest _)
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Todo")] HttpRequest req)
         {
             var all = TodoService.GetAll().ToList();
 
@@ -28,13 +30,38 @@ namespace AzureFunctionsSample
 
         [FunctionName("TodoGet")]
         public IActionResult Get(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Todo/{id}")] HttpRequest _, string id)
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "Todo/{id}")] HttpRequest req, string id)
         {
-            return Ok(id);
+            var model = TodoService.Get(id);
+
+            if (model is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(model);
+        }
+
+        [FunctionName("TodoPost")]
+        public async Task<IActionResult> Post(
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = "Todo")] TodoModel model)
+        {
+            var state = Validate(model);
+
+            if (!state.IsValid)
+            {
+                return BadRequest(state);
+            }
+
+            TodoService.Post(model);
+
+            await TodoService.SaveChanges();
+
+            return Ok(model);
         }
 
         [FunctionName("TodoPut")]
-        public IActionResult Put(
+        public async Task<IActionResult> Put(
             [HttpTrigger(AuthorizationLevel.Function, "put", Route = "Todo/{id}")] TodoModel model, string id)
         {
             var state = Validate(model);
@@ -44,35 +71,48 @@ namespace AzureFunctionsSample
                 return BadRequest(state);
             }
 
+            model.Id = id;
+            TodoService.Put(model);
+
+            await TodoService.SaveChanges();
+
             return Ok(model);
         }
 
         [FunctionName("TodoPatch")]
-        public IActionResult Patch(
-            [HttpTrigger(AuthorizationLevel.Function, "patch", Route = "Todo/{id}")] TodoModel model)
+        public async Task<IActionResult> Patch(
+            [HttpTrigger(AuthorizationLevel.Function, "patch", Route = "Todo/{id}")] TodoModel model, string id)
         {
-            var state = Validate(model);
+            var patch = TodoService.Get(id);
 
-            if (!state.IsValid)
+            if (patch is null)
             {
-                return BadRequest(state);
+                return NotFound();
             }
 
-            return Ok(model);
+            TodoService.Patch(patch, model);
+
+            await TodoService.SaveChanges();
+
+            return NoContent();
         }
 
         [FunctionName("TodoDelete")]
-        public IActionResult Delete(
-            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = "Todo/{id}")] TodoModel model)
+        public async Task<IActionResult> Delete(
+            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = "Todo/{id}")] HttpRequest req, string id, ILogger logger)
         {
-            var state = Validate(model);
+            var match = TodoService.Get(id);
 
-            if (!state.IsValid)
+            TodoService.Delete(match);
+
+            if (match != null)
             {
-                return BadRequest(state);
+                logger.LogInformation("Todo " + id + " deleted");
             }
 
-            return Ok(model);
+            await TodoService.SaveChanges();
+
+            return NoContent();
         }
     }
 }

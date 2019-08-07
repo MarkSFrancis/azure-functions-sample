@@ -12,5 +12,6 @@ namespace AzureFunctionsSample.Services
         void Patch(TodoModel model, TodoModel patchWith);
         void Put(TodoModel model);
         Task<int> SaveChanges();
+        void Post(TodoModel model);
     }
 }

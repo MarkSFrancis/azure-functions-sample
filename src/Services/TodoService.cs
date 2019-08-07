@@ -24,10 +24,22 @@ namespace AzureFunctionsSample.Services
             return AppContext.Todos.FirstOrDefault(t => t.Id == id);
         }
 
+        public void Post(TodoModel model)
+        {
+            AppContext.Todos.Add(model);
+        }
+
         public void Patch(TodoModel model, TodoModel patchWith)
         {
-            model.CompletedOn = patchWith.CompletedOn;
-            model.Name = patchWith.Name;
+            if (patchWith.CompletedOn.HasValue)
+            {
+                model.CompletedOn = patchWith.CompletedOn;
+            }
+
+            if (!string.IsNullOrWhiteSpace(patchWith.Name))
+            {
+                model.Name = patchWith.Name;
+            }
         }
 
         public void Put(TodoModel model)
