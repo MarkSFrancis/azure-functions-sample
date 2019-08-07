@@ -29,3 +29,10 @@ sudo apt-get update
 sudo apt-get install azure-functions-core-tools
 ```
 
+# Hello World
+
+A sample of a HelloWorld function can be found in `src/HelloWorldFunc.cs`
+
+# REST API
+
+A complete example of a REST API can be found in `src/TodoFunc.cs`, which also makes use of model binding, route mapping, and dependency injection
