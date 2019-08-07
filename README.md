@@ -3,7 +3,7 @@ This is a sample Azure Functions project
 
 # Getting Started
 
-This project uses the [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local) to debug on local, and runs [dotnet](https://dotnet.microsoft.com). Azure functions also support node functions, but this project is not using them. 
+This project uses the [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local) to debug on local, and runs [dotnet](https://dotnet.microsoft.com). Azure functions also support node, python (preview) and powershel (preview) functions, but this project is not using them. 
 
 ## Installing the Azure Functions Core Tools
 
