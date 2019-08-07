@@ -11,7 +11,7 @@ namespace AzureFunctionsSample
         public static IActionResult Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HelloWorldModel model)
         {
-            if (model?.Name is null)
+            if (string.IsNullOrWhiteSpace(model?.Name))
             {
                 return new BadRequestObjectResult("Please pass a name on the query string or in the request body");
             }

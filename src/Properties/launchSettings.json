@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "AzureFunctionsSample": {
+      "commandName": "Executable",
+      "executablePath": "%UserProfile%\\Appdata\\Local\\AzureFunctionsTools\\Releases\\2.28.0\\cli\\func.exe",
+      "commandLineArgs": "host start"
+    }
+  }
+}
